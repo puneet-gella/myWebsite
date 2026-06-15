@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Puneet Gella</title>
+
+  <!-- OCR A Std: the optical-character font used on credit cards / payment slips -->
+  <link href="https://fonts.cdnfonts.com/css/ocr-a-std" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #000000;
+      --fg: #ffffff;
+      --muted: #8e8e8e;
+      --line: rgba(255,255,255,0.18);
+      --card: "OCR A Std", "Courier New", ui-monospace, monospace;
+      --ticker-h: 42px;
+      --chart-color: #ffffff;   /* shifts green/red with mouse direction */
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-text-size-adjust: 100%; }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--card);
+      line-height: 1.7;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    /* ---------- Market ticker ---------- */
+    .ticker {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--ticker-h);
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      border-bottom: 1px solid var(--line);
+      background: var(--bg);
+      z-index: 10;
+      white-space: nowrap;
+      cursor: default;
+    }
+    .ticker::before, .ticker::after {
+      content: "";
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 64px;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .ticker::before { left: 0;  background: linear-gradient(90deg, var(--bg), transparent); }
+    .ticker::after  { right: 0; background: linear-gradient(270deg, var(--bg), transparent); }
+
+    .ticker__track {
+      display: inline-flex;
+      align-items: center;
+      gap: 2.5rem;
+      padding-left: 2.5rem;
+      animation: marquee 48s linear infinite;
+      will-change: transform;
+    }
+    .ticker:hover .ticker__track { animation-play-state: paused; }
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    .quote {
+      font-family: var(--card);
+      font-size: 0.8rem;
+      letter-spacing: 0.02em;
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+    .quote .sym { color: var(--fg); }
+    .quote .price { color: var(--fg); }
+    .quote.up .chg::before { content: "\25B2 "; }
+    .quote.dn .chg::before { content: "\25BC "; }
+    .quote.up .chg { color: var(--fg); }
+    .quote.dn .chg { color: var(--muted); }
+
+    /* ---------- Page layout ---------- */
+    .wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: calc(var(--ticker-h) + clamp(2rem, 6vw, 4rem)) clamp(1.5rem, 5vw, 4rem) clamp(2rem, 6vw, 4rem);
+    }
+    main { width: 100%; max-width: 640px; }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(14px);
+      animation: rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    .reveal:nth-child(1) { animation-delay: 0.05s; }
+    .reveal:nth-child(2) { animation-delay: 0.16s; }
+    .reveal:nth-child(3) { animation-delay: 0.28s; }
+    .reveal:nth-child(4) { animation-delay: 0.40s; }
+    .reveal:nth-child(5) { animation-delay: 0.52s; }
+    @keyframes rise { to { opacity: 1; transform: translateY(0); } }
+
+    .wordmark {
+      display: inline-block;
+      font-family: var(--card);
+      font-size: 0.8rem;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      text-decoration: none;
+      margin-bottom: 1.5rem;
+      transition: color 0.25s ease;
+    }
+    .wordmark:hover { color: var(--fg); }
+
+    /* ---------- Market chart ---------- */
+    .chart-wrap { margin-bottom: 1.5rem; }
+    .chart {
+      display: block;
+      width: 100%;
+      height: clamp(110px, 22vw, 150px);
+      overflow: visible;
+    }
+    .chart .area { fill: url(#chartFill); }
+    .chart .line {
+      fill: none;
+      stroke: var(--chart-color);
+      stroke-width: 1.6;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      vector-effect: non-scaling-stroke;
+      transition: stroke 0.3s ease;
+    }
+    .chart .dot {
+      fill: var(--chart-color);
+      transition: fill 0.3s ease;
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; r: 3; }
+      50%      { opacity: 0.45; r: 4.5; }
+    }
+    .chart-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-family: var(--card);
+      font-size: 0.72rem;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      margin-top: 0.4rem;
+    }
+    .chart-meta .now { color: var(--fg); }
+
+    .name {
+      font-family: var(--card);
+      font-size: clamp(2rem, 7vw, 3.75rem);
+      line-height: 1.1;
+      letter-spacing: 0;
+      margin-bottom: 1.75rem;
+    }
+
+    .bio {
+      font-size: clamp(0.98rem, 2.2vw, 1.1rem);
+      max-width: 54ch;
+      margin-bottom: 2.75rem;
+    }
+    .bio p + p { margin-top: 1rem; }
+    .bio em { font-style: italic; }
+
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.75rem 2.25rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--line);
+      list-style: none;
+    }
+    .links a {
+      position: relative;
+      color: var(--fg);
+      text-decoration: none;
+      font-size: 0.95rem;
+      letter-spacing: 0.01em;
+      padding-bottom: 3px;
+    }
+    .links a::after {
+      content: "";
+      position: absolute;
+      left: 0; bottom: 0;
+      width: 100%; height: 1px;
+      background: var(--fg);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .links a:hover::after,
+    .links a:focus-visible::after { transform: scaleX(1); }
+    .links a .label-sub {
+      display: block;
+      font-family: var(--card);
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+      margin-top: 3px;
+    }
+
+    a:focus-visible {
+      outline: 2px solid var(--fg);
+      outline-offset: 4px;
+      border-radius: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { animation: none; opacity: 1; transform: none; }
+      .ticker__track { animation: none; }
+      .chart .dot { animation: none; }
+      .links a::after { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Simulated market ticker (decorative). Values drift on their own; not live data. -->
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker__track" id="track"></div>
+  </div>
+
+  <div class="wrap">
+    <main>
+      <a class="wordmark reveal" href="https://www.puneetgella.com">www.puneetgella.com</a>
+
+      <!-- Simulated market chart (decorative). Colors green/red with mouse direction. -->
+      <div class="chart-wrap reveal" aria-hidden="true">
+        <svg class="chart" id="chart" viewBox="0 0 600 150" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stop-color="var(--chart-color)" stop-opacity="0.16" />
+              <stop offset="100%" stop-color="var(--chart-color)" stop-opacity="0" />
+            </linearGradient>
+          </defs>
+          <path class="area" id="area" d="" />
+          <path class="line" id="line" d="" />
+          <circle class="dot" id="dot" cx="0" cy="0" r="3" />
+        </svg>
+        <div class="chart-meta">
+          <span>SCU&nbsp;INDEX</span>
+          <span class="now" id="chartNow">&mdash;</span>
+        </div>
+      </div>
+
+      <h1 class="name reveal">Hi, I&rsquo;m Puneet</h1>
+
+      <div class="bio reveal">
+        <p>I am studying <em>Finance, Business Analytics &amp; Real Estate</em> at <em>Santa Clara</em>. My interests lie in market trends and operational efficiency.</p>
+        <p>I am currently doing research with <em>Prof. Gustavo Schwenkler on Subscription Lines</em>, validating pricing formulas across liquidity and fund-quality parameters.</p>
+      </div>
+
+      <ul class="links reveal">
+        <li>
+          <a href="mailto:puneet.gella@gmail.com">
+            Email
+            <span class="label-sub">puneet.gella@gmail.com</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://x.com/puneetgella" target="_blank" rel="noopener noreferrer">
+            X
+            <span class="label-sub">@puneetgella</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://www.linkedin.com/in/puneetgella777/" target="_blank" rel="noopener noreferrer">
+            LinkedIn
+            <span class="label-sub">/in/puneetgella777</span>
+          </a>
+        </li>
+      </ul>
+    </main>
+  </div>
+
+  <script>
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    /* ---------- Ticker (simulated) ---------- */
+    const seed = [
+      { sym: "SPX", price: 5483.2 }, { sym: "NDX", price: 19712.4 },
+      { sym: "DJI", price: 38904.1 }, { sym: "RUT", price: 2031.7 },
+      { sym: "AAPL", price: 214.30 }, { sym: "MSFT", price: 449.78 },
+      { sym: "NVDA", price: 126.57 }, { sym: "GOOGL", price: 178.92 },
+      { sym: "AMZN", price: 189.05 }, { sym: "VIX", price: 13.24 },
+      { sym: "US10Y", price: 4.281 }, { sym: "BTC", price: 64812 }
+    ];
+    const state = seed.map(s => ({ ...s, base: s.price, chg: 0 }));
+    const fmt = n => n >= 1000 ? n.toLocaleString("en-US", { maximumFractionDigits: 1 }) : n.toFixed(2);
+    function quoteHTML(s) {
+      const dir = s.chg >= 0 ? "up" : "dn";
+      const pct = s.base ? (s.chg / s.base) * 100 : 0;
+      return '<span class="quote ' + dir + '"><span class="sym">' + s.sym +
+        '</span><span class="price">' + fmt(s.price) + '</span><span class="chg">' +
+        Math.abs(pct).toFixed(2) + '%</span></span>';
+    }
+    function renderTicker() {
+      const html = state.map(quoteHTML).join("");
+      document.getElementById("track").innerHTML = html + html;
+    }
+    renderTicker();
+    if (!reduce) setInterval(() => {
+      for (let i = 0; i < 3; i++) {
+        const s = state[Math.floor(Math.random() * state.length)];
+        s.price = Math.max(0.01, s.price + s.base * (Math.random() - 0.5) * 0.004);
+        s.chg = s.price - s.base;
+      }
+      renderTicker();
+    }, 2600);
+
+    /* ---------- Market chart (simulated) ---------- */
+    const W = 600, H = 150, PAD = 16, N = 64;
+    const lineEl = document.getElementById("line");
+    const areaEl = document.getElementById("area");
+    const dotEl  = document.getElementById("dot");
+    const nowEl  = document.getElementById("chartNow");
+
+    let vals = [], v = 100;
+    for (let i = 0; i < N; i++) { v += (Math.random() - 0.48) * 2.2; vals.push(v); }
+
+    function buildPaths() {
+      const min = Math.min(...vals), max = Math.max(...vals);
+      const span = (max - min) || 1;
+      const pts = vals.map((val, i) => [
+        (i / (N - 1)) * W,
+        PAD + (1 - (val - min) / span) * (H - PAD * 2)
+      ]);
+      const d = pts.map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" ");
+      lineEl.setAttribute("d", d);
+      areaEl.setAttribute("d", d + " L" + W + " " + H + " L0 " + H + " Z");
+      const last = pts[pts.length - 1];
+      dotEl.setAttribute("cx", last[0]);
+      dotEl.setAttribute("cy", last[1]);
+      nowEl.textContent = vals[vals.length - 1].toFixed(2);
+    }
+    buildPaths();
+
+    if (!reduce) {
+      const len = lineEl.getTotalLength();
+      lineEl.style.strokeDasharray = len;
+      lineEl.style.strokeDashoffset = len;
+      lineEl.getBoundingClientRect();
+      lineEl.style.transition = "stroke-dashoffset 1.4s cubic-bezier(0.22,1,0.36,1)";
+      lineEl.style.strokeDashoffset = "0";
+      setTimeout(() => { lineEl.style.transition = "stroke 0.3s ease"; lineEl.style.strokeDasharray = ""; }, 1500);
+
+      setInterval(() => {
+        v += (Math.random() - 0.48) * 2.4;
+        vals.push(v); vals.shift();
+        buildPaths();
+      }, 1800);
+    }
+
+    /* ---------- Mouse-direction color: up = green, down = red ---------- */
+    const UP = "#16c784", DOWN = "#ea3943", NEUTRAL = "#ffffff";
+    let lastY = null, idleTimer;
+    function setChartColor(c) {
+      document.documentElement.style.setProperty("--chart-color", c);
+    }
+    window.addEventListener("mousemove", (e) => {
+      if (lastY !== null) {
+        const dy = e.clientY - lastY;
+        if (dy < -2) setChartColor(UP);
+        else if (dy > 2) setChartColor(DOWN);
+      }
+      lastY = e.clientY;
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => setChartColor(NEUTRAL), 900);
+    }, { passive: true });
+  </script>
+</body>
+</html>
