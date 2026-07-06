@@ -80,8 +80,8 @@
     .quote .price { color: var(--fg); }
     .quote.up .chg::before { content: "\25B2 "; }
     .quote.dn .chg::before { content: "\25BC "; }
-    .quote.up .chg { color: var(--fg); }
-    .quote.dn .chg { color: var(--muted); }
+    .quote.up .chg { color: #16c784; }
+    .quote.dn .chg { color: #ea3943; }
 
     /* ---------- Page layout ---------- */
     .wrap {
@@ -427,11 +427,10 @@
     /* ---------- Ticker (simulated) ---------- */
     const seed = [
       { sym: "SPX", price: 5483.2 }, { sym: "NDX", price: 19712.4 },
-      { sym: "DJI", price: 38904.1 }, { sym: "RUT", price: 2031.7 },
-      { sym: "AAPL", price: 214.30 }, { sym: "MSFT", price: 449.78 },
-      { sym: "NVDA", price: 126.57 }, { sym: "GOOGL", price: 178.92 },
-      { sym: "AMZN", price: 189.05 }, { sym: "VIX", price: 13.24 },
-      { sym: "US10Y", price: 4.281 }, { sym: "BTC", price: 64812 }
+      { sym: "DJI", price: 38904.1 }, { sym: "AAPL", price: 214.30 },
+      { sym: "MSFT", price: 449.78 }, { sym: "NVDA", price: 126.57 },
+      { sym: "GOOGL", price: 178.92 }, { sym: "AMZN", price: 189.05 },
+      { sym: "VIX", price: 13.24 }, { sym: "BTC", price: 64812 }
     ];
     const state = seed.map(s => ({ ...s, base: s.price, chg: 0 }));
     const fmt = n => n >= 1000 ? n.toLocaleString("en-US", { maximumFractionDigits: 1 }) : n.toFixed(2);
@@ -442,8 +441,44 @@
         '</span><span class="price">' + fmt(s.price) + '</span><span class="chg">' +
         Math.abs(pct).toFixed(2) + '%</span></span>';
     }
+
+    // Personal "life metrics" woven into the tape for character.
+    const customs = [
+      { sym: "RUN",   unit: "MI", base: 24.3, dp: 1, val: 24.3, chg: 2.1 },
+      { sym: "SWIM",  unit: "KM", base: 3.2,  dp: 1, val: 3.2,  chg: 5.0 },
+      { sym: "STEPS", unit: "K",  base: 11.2, dp: 1, val: 11.2, chg: 8.4 },
+      { sym: "TRAIL", unit: "MI", base: 8.0,  dp: 1, val: 8.0,  chg: 4.0 },
+      { sym: "SLEEP", unit: "H",  base: 7.4,  dp: 1, val: 7.4,  chg: -1.2 },
+      { sym: "GRASS TOUCHED", joke: true }
+    ];
+    function randomizeCustoms() {
+      customs.forEach(c => {
+        if (c.joke) return;
+        c.val = c.base * (0.85 + Math.random() * 0.3);              // ±15% around base
+        c.chg = (Math.random() < 0.25 ? -1 : 1) * (Math.random() * 9 + 0.3); // mostly up, occasional dip
+      });
+    }
+    function customHTML(c) {
+      if (c.joke) {
+        return '<span class="quote up"><span class="sym">GRASS TOUCHED</span><span class="chg">\u221E%</span></span>';
+      }
+      const dir = c.chg >= 0 ? "up" : "dn";
+      return '<span class="quote ' + dir + '"><span class="sym">' + c.sym + '</span>' +
+        '<span class="price">' + c.val.toFixed(c.dp) + c.unit + '</span>' +
+        '<span class="chg">' + Math.abs(c.chg).toFixed(1) + '%</span></span>';
+    }
+
     function renderTicker() {
-      const html = state.map(quoteHTML).join("");
+      const market = state.map(quoteHTML);
+      const custom = customs.map(customHTML);
+      const seq = [];
+      let ci = 0;
+      market.forEach((m, i) => {
+        seq.push(m);
+        if (i % 2 === 1 && ci < custom.length) seq.push(custom[ci++]);
+      });
+      while (ci < custom.length) seq.push(custom[ci++]);
+      const html = seq.join("");
       document.getElementById("track").innerHTML = html + html;
     }
     renderTicker();
@@ -453,6 +488,7 @@
         s.price = Math.max(0.01, s.price + s.base * (Math.random() - 0.5) * 0.004);
         s.chg = s.price - s.base;
       }
+      randomizeCustoms();
       renderTicker();
     }, 2600);
 
