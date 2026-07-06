@@ -316,12 +316,17 @@
       background: rgba(0,0,0,0.55); border: 1px solid var(--line); color: var(--fg);
       font-size: 1.15rem; line-height: 1; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      transition: border-color 0.2s ease, background 0.2s ease; z-index: 2;
+      transition: opacity 0.25s ease, border-color 0.2s ease, background 0.2s ease; z-index: 2; opacity: 0;
     }
     .carousel__btn:hover { border-color: var(--fg); background: rgba(0,0,0,0.8); }
     .carousel__btn.prev { left: 10px; }
     .carousel__btn.next { right: 10px; }
-    .carousel__dots { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 7px; z-index: 2; }
+    .carousel__dots { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 7px; z-index: 2; opacity: 0; transition: opacity 0.25s ease; }
+    .project-card:hover .carousel__btn,
+    .project-card:focus-within .carousel__btn,
+    .project-card:hover .carousel__dots,
+    .project-card:focus-within .carousel__dots { opacity: 1; }
+    @media (hover: none) { .carousel__btn, .carousel__dots { opacity: 1; } }
     .carousel__dots button { width: 7px; height: 7px; padding: 0; border-radius: 50%; border: 1px solid var(--fg); background: transparent; cursor: pointer; }
     .carousel__dots button.active { background: var(--fg); }
   </style>
@@ -547,7 +552,7 @@
         const d = document.createElement("button");
         d.type = "button";
         if (n === 0) d.classList.add("active");
-        d.addEventListener("click", () => go(n));
+        d.addEventListener("click", (e) => { go(n); if (e.detail) e.currentTarget.blur(); });
         dotsWrap.appendChild(d);
       });
       const dots = dotsWrap.querySelectorAll("button");
@@ -556,8 +561,8 @@
         track.style.transform = "translateX(" + (-idx * 100) + "%)";
         dots.forEach((d, i) => d.classList.toggle("active", i === idx));
       }
-      root.querySelector(".prev").addEventListener("click", () => go(idx - 1));
-      root.querySelector(".next").addEventListener("click", () => go(idx + 1));
+      root.querySelector(".prev").addEventListener("click", (e) => { go(idx - 1); if (e.detail) e.currentTarget.blur(); });
+      root.querySelector(".next").addEventListener("click", (e) => { go(idx + 1); if (e.detail) e.currentTarget.blur(); });
     })();
   </script>
 </body>
