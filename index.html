@@ -304,6 +304,19 @@
     .project-name { font-family: var(--card); font-size: 1.05rem; margin-bottom: 0.5rem; }
     .project-name .project-tag { color: var(--muted); font-size: 0.8rem; letter-spacing: 0.02em; }
     .project-summary { font-size: 0.92rem; line-height: 1.6; }
+    .project-link {
+      display: inline-block;
+      margin-top: 0.95rem;
+      font-family: var(--card);
+      font-size: 0.82rem;
+      letter-spacing: 0.03em;
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 2px;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .project-link:hover, .project-link:focus-visible { color: var(--fg); border-color: var(--fg); }
 
     /* ---------- Holdings: wider column + image carousel ---------- */
     #projects main { max-width: 900px; }
@@ -432,6 +445,14 @@
             <div class="project-body">
               <h2 class="project-name">Compounding <span class="project-tag">(21 Day Cycle)</span></h2>
               <p class="project-summary">Wanted a sharper way to stay consistent, so I built a dashboard that tracks daily execution across eleven metrics and charts momentum over a 21-day cycle. Slide through the frames to watch a cycle fill in --&gt;</p>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <div class="project-body">
+              <h2 class="project-name">Subscription Lines <span class="project-tag">(Working Paper '25)</span></h2>
+              <p class="project-summary">Research assistant to Prof. Gustavo Schwenkler, validating pricing formulas for subscription (capital-call) credit facilities across liquidity and fund-quality parameters &mdash; building and stress-testing the models to find where the pricing holds and where it breaks.</p>
+              <a class="project-link" href="https://drive.google.com/file/d/13OHy4fwCoYX26c4f4Z5yxS7gEvRnoazp/view" target="_blank" rel="noopener noreferrer" title="Subscription Lines in Private Equity: General Equilibrium and Pricing">View working paper &#8599;</a>
             </div>
           </article>
         </div>
