@@ -637,6 +637,18 @@
       idleTimer = setTimeout(() => setChartColor(NEUTRAL), 900);
     }, { passive: true });
 
+    // Touch / mobile: scroll up = green, scroll down = red.
+    let lastScrollY = window.scrollY || window.pageYOffset || 0;
+    window.addEventListener("scroll", () => {
+      const y = window.scrollY || window.pageYOffset || 0;
+      const dy = y - lastScrollY;
+      if (dy < -1) setChartColor(UP);
+      else if (dy > 1) setChartColor(DOWN);
+      lastScrollY = y;
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => setChartColor(NEUTRAL), 900);
+    }, { passive: true });
+
     /* ---------- Tab / view switching ---------- */
     const tabs = document.querySelectorAll(".nav-tab");
     const views = {
