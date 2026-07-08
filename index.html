@@ -205,10 +205,18 @@
     .links {
       display: flex;
       flex-wrap: wrap;
-      gap: 1.75rem 2.25rem;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem 0;
       padding-top: 2rem;
       border-top: 1px solid var(--line);
       list-style: none;
+    }
+    .links li { display: flex; align-items: center; }
+    .links li:not(:last-child)::after {
+      content: "\00B7";
+      color: var(--muted);
+      margin: 0 1.1rem;
     }
     .links a {
       position: relative;
@@ -434,24 +442,10 @@
       </div>
 
       <ul class="links reveal">
-        <li>
-          <a href="mailto:puneet.gella@gmail.com">
-            Email
-            <span class="label-sub">puneet.gella@gmail.com</span>
-          </a>
-        </li>
-        <li>
-          <a href="https://x.com/puneetgella" target="_blank" rel="noopener noreferrer">
-            X
-            <span class="label-sub">@puneetgella</span>
-          </a>
-        </li>
-        <li>
-          <a href="https://www.linkedin.com/in/puneetgella777/" target="_blank" rel="noopener noreferrer">
-            LinkedIn
-            <span class="label-sub">/in/puneetgella777</span>
-          </a>
-        </li>
+        <li><a href="mailto:pgella@scu.edu">Email</a></li>
+        <li><a href="https://x.com/puneetgella" target="_blank" rel="noopener noreferrer">X</a></li>
+        <li><a href="https://www.linkedin.com/in/puneetgella777/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+        <li><a href="https://github.com/puneet-gella" target="_blank" rel="noopener noreferrer">GitHub</a></li>
       </ul>
     </main>
     </section>
