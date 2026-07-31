@@ -398,12 +398,16 @@
     .tl-end rect { stroke: #16c784; fill: rgba(22,199,132,0.08); }
     .tl-end:hover rect { stroke: #16c784; fill: rgba(22,199,132,0.14); }
     .tl-end .tl-t { fill: #16c784; }
+    .tl-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 1rem 1.25rem; }
+    .tl-head .proj-title { margin-bottom: 0; }
+    .tl-info { text-align: right; max-width: 300px; margin-left: auto; }
+    .tl-hint { font-family: var(--card); font-size: 0.76rem; letter-spacing: 0.04em; color: var(--muted); }
     .tl-detail {
-      margin-top: 1.1rem;
-      min-height: 2.4em;
+      margin-top: 0.45rem;
+      min-height: 2.6em;
       font-family: var(--card);
-      font-size: 0.85rem;
-      line-height: 1.5;
+      font-size: 0.84rem;
+      line-height: 1.4;
       color: var(--fg);
       opacity: 0;
       transition: opacity 0.25s ease;
@@ -541,7 +545,13 @@
 
     <section id="timeline" class="view" hidden>
       <main>
-        <h1 class="proj-title">Timeline</h1>
+        <div class="tl-head">
+          <h1 class="proj-title">Timeline</h1>
+          <div class="tl-info">
+            <div class="tl-hint">hover or tap a cell</div>
+            <div class="tl-detail" id="tlDetail"></div>
+          </div>
+        </div>
         <svg class="tl-svg" viewBox="0 0 620 620" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Career path from UC Riverside through Santa Clara University to BlackRock">
           <defs>
             <marker id="tlArrow" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
@@ -621,7 +631,6 @@
             <text class="tl-s" x="310" y="559">TDO intern &middot; current</text>
           </g>
         </svg>
-        <div class="tl-detail" id="tlDetail"></div>
       </main>
     </section>
   </div>
