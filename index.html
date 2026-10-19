@@ -416,6 +416,7 @@
     .tl-detail.show { opacity: 1; }
     #timeline .tl-node { cursor: pointer; }
     .tl-detail .tl-list-label { color: var(--muted); }
+    .tl-detail .tl-list { margin-top: 0.55rem; }
 
     /* ---------- Holdings: wider column + image carousel ---------- */
     #projects main { max-width: 900px; }
@@ -982,7 +983,7 @@
       const show = (n) => {
         let html = esc(n.getAttribute("data-info") || "");
         const list = n.getAttribute("data-list");
-        if (list) html += "<br><span class=\"tl-list-label\">Sponsors brought:</span> " + esc(list);
+        if (list) html += "<div class=\"tl-list\"><span class=\"tl-list-label\">Sponsors brought:</span> " + esc(list) + "</div>";
         detail.innerHTML = html; detail.classList.add("show");
       };
       const hide = () => detail.classList.remove("show");
