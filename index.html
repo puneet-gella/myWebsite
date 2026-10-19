@@ -415,6 +415,7 @@
     }
     .tl-detail.show { opacity: 1; }
     #timeline .tl-node { cursor: pointer; }
+    .tl-detail .tl-list-label { color: var(--muted); }
 
     /* ---------- Holdings: wider column + image carousel ---------- */
     #projects main { max-width: 900px; }
@@ -670,7 +671,7 @@
             <text class="tl-t" x="150" y="412">1752vc</text>
             <text class="tl-s" x="150" y="429">VC fellow</text>
           </g>
-          <g class="tl-node" data-info="Connected the club with industry and sponsors.">
+          <g class="tl-node" data-info="Connected the club with industry and sponsors." data-list="CrowdStrike, AWS, Tencent Cloud, GetStream.io, Roblox">
             <rect x="360" y="324" width="220" height="52" rx="4"/>
             <text class="tl-t" x="470" y="344">ACM</text>
             <text class="tl-s" x="470" y="361">Industry liaison</text>
@@ -977,7 +978,13 @@
       const detail = document.getElementById("tlDetail");
       if (!tl || !detail) return;
       let pinned = null;
-      const show = (n) => { detail.textContent = n.getAttribute("data-info") || ""; detail.classList.add("show"); };
+      const esc = (s) => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+      const show = (n) => {
+        let html = esc(n.getAttribute("data-info") || "");
+        const list = n.getAttribute("data-list");
+        if (list) html += "<br><span class=\"tl-list-label\">Sponsors brought:</span> " + esc(list);
+        detail.innerHTML = html; detail.classList.add("show");
+      };
       const hide = () => detail.classList.remove("show");
       tl.addEventListener("mouseover", (e) => {
         const n = e.target.closest(".tl-node");
